@@ -31,6 +31,7 @@ namespace ReactCheesecakeOrders.Data
         {
             var context = new OrdersDataContext(_connenectionString);
             context.Orders.Add(order);
+            context.SaveChanges();
         }
     }
 }

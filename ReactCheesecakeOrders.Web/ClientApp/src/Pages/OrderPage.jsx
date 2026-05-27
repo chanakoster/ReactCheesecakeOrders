@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { produce } from 'immer';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import dayjs from 'dayjs';
 
 const flavors = ['Classic', 'Chocolate', 'Red Velvet', 'Brownie'];
 const toppingChoices = ['Strawberries', 'Blueberries', 'Chocolate Chips', 'Whipped Cream'];
@@ -15,11 +16,9 @@ const OrderForm = () => {
         name: '',
         email: '',
         flavor: '',
-        toppings: '',
         specialRequests: '',
         quantity: 0,
         deliveryDate: '',
-        total: 0
     });
 
     const [toppingsList, setToppingsList] = useState([]);
@@ -36,12 +35,8 @@ const OrderForm = () => {
     }
 
     const onSubmitClick = async () => {
-        const nextState = produce(order, draft => {
-            draft.toppings = toppings();
-            draft.total = total();
-        })
-        await axios.post('/api/cheesecake/submitorder', nextState)
-        navigate('/')
+        await axios.post('/api/cheesecake/submitorder', { ...order, total: total, toppings: toppings })
+        navigate('/vieworders')
     }
 
     const onToppingsCheckboxChange = e => {
@@ -57,28 +52,9 @@ const OrderForm = () => {
         setToppingsList(nextState);
     }
 
-    //const setToppingsString = () => {
-    //    console.log("helloooo");
-    //    const nextState = produce(order, draft => {
-    //        draft.toppings = toppingsList.join(', ');
-    //    })
-    //    setOrder(nextState);
-    //}
+    const toppings = toppingsList.join(', ');
 
-    const toppings = () => {
-        return toppingsList.join(', ');
-    }
-
-    //const calculateTotal = () => {
-    //    const nextState = produce(order, draft => {
-    //        draft.total = quantity * 49.99 + toppings.length * 3.95;
-    //    })
-    //    setOrder(nextState)
-    //}
-
-    const total = () => {
-        return order.quantity * 49.99 + toppingsList.length * 3.95;
-    }
+    const total = order.quantity * 49.99 + toppingsList.length * 3.95;
 
     const { name, email, flavor, specialRequests, quantity, deliveryDate } = order;
 
@@ -118,11 +94,11 @@ const OrderForm = () => {
                     <div className="card-body">
                         <span>Your Custom Cheesecake</span>
                         <p>Base: {flavor ? flavor : 'Choose...'}</p>
-                        <p>Toppings: {toppingsList && toppings()}</p>
+                        <p>Toppings: {toppingsList && toppings}</p>
                         <p>Special Requests: {specialRequests}</p>
                         <p>Quantity: {quantity}</p>
-                        <p>Delivery Date: {deliveryDate}</p>
-                        <p>Total: ${total()}</p>
+                        <p>Delivery Date: {dayjs(deliveryDate).format("MM/DD/YYYY")}</p>
+                        <p>Total: ${total}</p>
                     </div>
                 </div>
             </div>

@@ -22,12 +22,13 @@ namespace ReactCheesecakeOrders.Web.Controllers
             return repo.GetOrders();
         }
 
-        [Route("getorderbyid")]
+        [Route("getorder")]
         public Order GetOrderById(int id)
         {
             var repo = new OrderRepository(_connectionString);
             return repo.GetOrderById(id);
         }
+
 
         [Route("submitorder")]
         [HttpPost]
@@ -35,6 +36,7 @@ namespace ReactCheesecakeOrders.Web.Controllers
         {
             var repo = new OrderRepository(_connectionString);
             repo.SubmitOrder(order);
+
         }
     }
 }
