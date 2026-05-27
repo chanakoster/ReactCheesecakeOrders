@@ -33,11 +33,14 @@ const OrderForm = () => {
         });
 
         setOrder(nextState);
-        calculateTotal();
     }
 
     const onSubmitClick = async () => {
-        await axios.post('/api/cheesecake/submitorder', order)
+        const nextState = produce(order, draft => {
+            draft.toppings = toppings();
+            draft.total = total();
+        })
+        await axios.post('/api/cheesecake/submitorder', nextState)
         navigate('/')
     }
 
@@ -52,28 +55,32 @@ const OrderForm = () => {
         });
 
         setToppingsList(nextState);
-        setToppingsString();
-        calculateTotal();
-        console.log(toppingsList)
-        console.log(order);
     }
 
-    const setToppingsString = () => {
-        console.log("helloooo");
-        const nextState = produce(order, draft => {
-            draft.toppings = toppingsList.join(', ');
-        })
-        setOrder(nextState);
+    //const setToppingsString = () => {
+    //    console.log("helloooo");
+    //    const nextState = produce(order, draft => {
+    //        draft.toppings = toppingsList.join(', ');
+    //    })
+    //    setOrder(nextState);
+    //}
+
+    const toppings = () => {
+        return toppingsList.join(', ');
     }
 
-    const calculateTotal = () => {
-        const nextState = produce(order, draft => {
-            draft.total = quantity * 49.99 + toppings.length * 3.95;
-        })
-        setOrder(nextState)
+    //const calculateTotal = () => {
+    //    const nextState = produce(order, draft => {
+    //        draft.total = quantity * 49.99 + toppings.length * 3.95;
+    //    })
+    //    setOrder(nextState)
+    //}
+
+    const total = () => {
+        return order.quantity * 49.99 + toppingsList.length * 3.95;
     }
 
-    const { name, email, flavor, toppings, specialRequests, quantity, deliveryDate, total } = order;
+    const { name, email, flavor, specialRequests, quantity, deliveryDate } = order;
 
     return (
         <div className="row" style={{ marginTop: '20px' }}>
@@ -111,11 +118,11 @@ const OrderForm = () => {
                     <div className="card-body">
                         <span>Your Custom Cheesecake</span>
                         <p>Base: {flavor ? flavor : 'Choose...'}</p>
-                        <p>Toppings: {toppingsList && toppings}</p>
+                        <p>Toppings: {toppingsList && toppings()}</p>
                         <p>Special Requests: {specialRequests}</p>
                         <p>Quantity: {quantity}</p>
                         <p>Delivery Date: {deliveryDate}</p>
-                        <p>Total: ${total}</p>
+                        <p>Total: ${total()}</p>
                     </div>
                 </div>
             </div>
